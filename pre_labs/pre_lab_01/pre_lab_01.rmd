@@ -220,7 +220,9 @@ umd_courses |>
     mean_seats = mean(seats),
     median_seats = median(seats),
     # add minimum seats here
+    min_seats = min(seats),
     # add maximum seats here
+    max_seats = max(seats)
   ) |>
   arrange(desc(total_seats))
 ```
@@ -235,8 +237,8 @@ No code here; I want you to provide three questions that this data suggests to y
 
 **Answer**
 
-1.  
+1.  Which are the most frequently taught classes across semesters?
 
-2.  
+2.  Which classes fill up completely/which stay empty the longest?
 
-3.  
+3.  Which classes are taught throughout the year? Which are exclusive to one kind of term?
