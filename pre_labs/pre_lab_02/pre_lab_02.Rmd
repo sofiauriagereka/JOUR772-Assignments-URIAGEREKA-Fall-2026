@@ -304,8 +304,7 @@ standardized_maryland_expenses <- maryland_expenses |>
 
 **Task** Search the Internet for tidyverse functions similar to str_to_upper. Name at least two and describe what they do. If you use ChatGPT for this, include the question you submitted.
 
-**Answer:** I used this website: <https://stringr.tidyverse.org/reference/case.html> and the functions I found that were similar, if a bit obvious, were: `str_to_lower()` which converts to lower case, `str_to_title()` which converts to title case, where only the first letter of
-each word is capitalized, and`str_to_sentence()` which convert to sentence case, where only the first letter of the sentence is capitalized.
+**Answer:** I used this website: <https://stringr.tidyverse.org/reference/case.html> and the functions I found that were similar, if a bit obvious, were: `str_to_lower()` which converts to lower case, `str_to_title()` which converts to title case, where only the first letter of each word is capitalized, and`str_to_sentence()` which convert to sentence case, where only the first letter of the sentence is capitalized.
 
 There are lots of potential uses for standardization - addresses, zip codes, anything that can be misspelled or abbreviated.
 

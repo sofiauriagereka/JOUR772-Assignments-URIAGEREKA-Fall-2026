@@ -1,0 +1,127 @@
+---
+title: "lab_02"
+author: "Derek Willis"
+date: "2025-01-16"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Load libraries and establish settings
+
+```{r}
+# Turn off scientific notation
+options(scipen=999)
+
+# Load the tidyverse. If you have not installed the tidyverse already, remove the # from the next line and run it first.  
+# install.packages('tidyverse')
+library(tidyverse)
+library(lubridate)
+```
+
+## Load Data
+
+Let's keep working with the UMD courses and Maryland campaign expense data we used in the pre_lab.
+
+```{r}
+umd_courses <- read_rds("data/umd_courses.rds")
+maryland_expenses <- read_csv("data/maryland_expenses.csv")
+```
+
+## Answer questions
+
+**Q1.** How many departments have offered the courses with "Climate" in the title and at least one seat? Which department has offered the most? **A1. 32 courses, most in Atmospheric and Oceanic Science**
+
+```{r}
+climate_courses <- umd_courses |>
+  group_by(department) |>
+  filter(str_detect(title, "Climate") & seats >= 1) |>
+  summarize(word_climate = n()) |>
+  arrange(desc(word_climate))
+
+climate_courses
+```
+
+**Q2.** Of the departments listed in A1, which one is the most interesting to you, and why? **A2. Art History and Archaeology was the most interesting to me, because I don't immediately associate it with the climate, although I suppose everything is connected in that way.**
+
+**Q3** Which departments offered the most courses in the Fall 2024 term? And which departments in that term have at least one syllabus posted? Answer both of those questions and then compare the top five departments - how are they different?
+
+**A3.** **the top five departments with at least one syllabus for fall 2024 were: Business and management, Economics, School of Music, Information Studies, Engineering, Professional Masters**
+
+```{r}
+# looking at departments in fall 2024
+fall_2024_courses <- umd_courses |> filter (term == 202408)
+
+fall_2024_courses |>
+  group_by(department) |>
+  summarise(
+    count_classes = n()
+  ) |>
+  arrange(desc(count_classes))
+```
+
+```{r}
+#same but with syllabus
+syllabus_fall_2024_courses <- umd_courses |> filter (term == 202408 & syllabus_count >= 1)
+
+syllabus_fall_2024_courses |>
+  group_by(department) |>
+  summarise(
+    count_classes = n()
+  ) |>
+  arrange(desc(count_classes))
+```
+
+**Q4.** Using the Maryland campaign expenses data, change the datatype of the expenditure_date column so that it is a date and not a chr, saving the result as a new dataframe. Then create a new column for the month based on expenditure_date. Then write code that shows total amount spent each month by Wes Moore's committee (you'll need to search the data to find the exact name, and we're not looking in payee_name). Write a sentence describing the pattern of spending over time. **A4. The spending increases over time by quite a bit**
+
+```{r}
+maryland_expenses <- maryland_expenses |> mutate(new_expenditure_date=mdy(expenditure_date))
+```
+
+```{r}
+wes_moore <- maryland_expenses |> filter(str_detect(committee_name, "Wes For"))
+```
+
+```{r}
+wes_moore |>
+  mutate(month = floor_date(new_expenditure_date, "month")) |>
+  group_by(month) |>
+  summarise(total_amount = sum(amount)) |>
+  arrange(month)
+
+```
+
+**Q5.** Using case_when(), create a column in the Maryland expenses data called `spending_location` indicating whether each record spent money in Maryland or outside Maryland. For records that are in Maryland, make the new column's value "In-state" and for all others, make it "Out of state". Then write code that shows the total amount of money spent in each category and describe the results. You can do this in one statement or break it up into two statements (saving the new column to your dataframe). **A5: i looked in the prelab for an example that seemed to fit this case and saw that, as expected, the in-state donation amounts were considerably higher.**
+
+```{r}
+maryland_expenses_with_state <- maryland_expenses |>
+  mutate(
+    spending_location = case_when(
+      str_detect(address, " Maryland ") ~ "in-state",
+      str_detect(address, " California ") ~ "out of state",
+      str_detect(address, " Washington ") ~ "out of state",
+      str_detect(address, " Louisiana ") ~ "out of state",
+      str_detect(address, " Florida ") ~ "out of state",
+      str_detect(address, " North Carolina ") ~ "out of state",
+      str_detect(address, " Massachusetts ") ~ "out of state",
+      str_detect(address, " West Virginia ") ~ "out of state",
+      str_detect(address, " Virginia ") ~ "out of state",
+      .default = NA
+    )
+  ) |>
+  group_by(spending_location) |>
+  summarise(
+    total_amount = sum(amount)
+  ) |>
+  arrange(desc(total_amount))
+```
+
+**Q6.** Choose your own adventure: using either the UMD courses or campaign expenses data, ask and answer a question that is different than the previous ones. You can use one of the ones you provided in the pre_lab. **A6. This is probably a cop-out, but I picked this exercise from the pre-lab and changed the variables of the department and the seats**
+
+```{r}
+and_philosophy_seats_10 <- umd_courses |> filter(department == "Philosophy" & seats >= 10)
+
+nrow(and_philosophy_seats_10)
+```
