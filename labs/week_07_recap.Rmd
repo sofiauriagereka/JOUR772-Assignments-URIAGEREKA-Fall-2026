@@ -40,126 +40,165 @@ Most questions have a code block and a space for an answer below. Write the code
 
 #### **Q1** Do you notice anything different with this read_csv()? Particularly in the file name?
 
-**A1:**
+**A1: it comes from a website, as evidenced by the <https://> at the beginning rather than the data/**
 
 ------------------------------------------------------------------------
 
 #### **Q2** How many records there are there in this dataset? What do they mean and what useful information we can gather from it, looking at the columns?
 
-**A2:**
+**A2: 10487 as of when I downloaded the cvs, each one represents a tremor detected by the US geological survey, we can gather the location, severity, the nearby city, the time it occurred, etc.**
 
 ------------------------------------------------------------------------
 
 #### **Q3** How do I reorganize this list to see the ones that are the deepest first? What is the depth that shows up for the deepest one, and its magnitude?
 
 ```{r}
+earthquakes |> arrange(desc(depth))
 
 ```
 
-**A3:**
+**A3: the biggest one has a depth of 665.057**
 
 ------------------------------------------------------------------------
 
 #### **Q4** I just want to see the earthquakes with a magnitude larger than 6. How do I do that? And how many are there that fit this criteria?
 
 ```{r}
+earthquakes |>
+  filter(mag > 6)
 
 ```
 
-**A4:**
+**A4: there are 4 earthquakes with a magnitude larger than 6**
 
 ------------------------------------------------------------------------
 
 #### **Q5** What about if I want to see earthquakes that have both a magnitude larger than 6 and a depth smaller than 20? How many are there in the data set that fit [both]{.underline} these criteria?
 
 ```{r}
+earthquakes |>
+  filter(mag > 6 & depth < 20)
 
 ```
 
-**A5:**
+**A5: there's just one**
 
 ------------------------------------------------------------------------
 
 #### **Q6** What about if I want to see earthquakes that either have a magnitude larger than 6 and a depth smaller than 20? How many are there in the data set that fit [either]{.underline} these criteria?
 
 ```{r}
+earthquakes |>
+  filter(mag > 6 | depth < 20)
+
 
 ```
 
-**A6:**
+**A6: 8247 at the time that I downloaded the csv**
 
 ------------------------------------------------------------------------
 
 #### **Q7** I'm interested in finding earthquakes that took place in Alaska. Which column should I look at? How do I use it to find all the earthquakes in Alaska? How many earthquakes took place there?
 
 ```{r}
-
+alaska_only <-earthquakes|>
+filter(str_detect(locationSource, 'ak')) 
+nrow(alaska_only)
 ```
 
-**A7:**
+**A7: I went to location source to find the alaska state abbreviation and filtered for that, when I downloaded the data there were 2391 earthquakes there.**
 
 ------------------------------------------------------------------------
 
 #### **Q8** I notice that there is a column called 'type', that seems to have different kinds of tremors. What is the best way to find what are all the possible types of tremors, and counting how many of each there are in this data set? What are the first two most common types of tremors in this data set?
 
 ```{r}
-
+earthquakes |>
+  group_by(type) |>
+  count()
 ```
 
-**A8:**
+**A8: the most common types are earthquakes and quarry blasts, you can find that by using group_by and then count ()**
 
 ------------------------------------------------------------------------
 
 #### **Q9** How do I calculate the average depth of each type of tremor? What is the average depth of the earthquake type in this data set? Is there anything that seems unusual or surprising in this finding?
 
 ```{r}
+earthquakes |>
+  group_by(type) |>
+  summarise(avg_depth = mean(depth)) |>
+  arrange(desc(avg_depth))
 
 ```
 
-**A9:**
+**A9: The average depth is 23.86, I don't know enough about earthquakes to be surprised by this data other than to say I found it interesting that the depth of a quarry blast on average is only -0.29 in comparison.**
 
 ------------------------------------------------------------------------
 
 #### **Q10** I'm interested, in the future, to see the hours in which earthquakes happen. How can I extract the hour from the time column?
 
 ```{r}
+earthquakes <- earthquakes |> mutate (hour_during_day = hour(time))
+
+earthquakes |>
+  group_by(hour_during_day) |>
+  count() |>
+  arrange (desc(n))
 
 ```
 
-**A10:**
+**A10: I created a new data set and then just used group_by like in previous answers**
 
 ------------------------------------------------------------------------
 
 #### **Q11** I want to make a note of all the records in this data set that I consider serious. For my purposes, I'm thinking that all tremors that have a magnitude that is larger than 3 are serious. How do I automatically create a new column making that distinction?
 
 ```{r}
-
+earthquakes <- earthquakes |>
+  mutate(oh_no_meter = case_when(mag > 3 ~ "serious", .default = "not serious"))
 ```
 
-**A11:**
+**A11: I used mutate to separate the earthquakes with a mag over three to be classes as "serious"**
 
 ------------------------------------------------------------------------
 
 #### **Q12** I have no idea how earthquakes work and I'm interested in seeing if there is a particular time of day in which serious earthquakes happen. How can I see that condensed in a table with all the hours in a day and all the serious earthquakes in each hour? What is the hour with fewer serious earthquakes and the one with the most serious earthquakes?
 
 ```{r}
-
+earthquakes |>
+  filter(mag > 3) |>
+  group_by(hour_during_day) |>
+  count()
+  arrange (n)
 ```
 
-**A12**:
+**A12**: **I filtered to show the earthquakes with a mag greater than 3 and then organized them in descending order by the hour in the day in which they occurred, 9 am had the least, and 8 pm (20 hr) had the most.**
 
 ------------------------------------------------------------------------
 
 #### EXTRA Q What other questions are you interested in and how would you ask them in R?
 
+**I was interested to see which areas had the most frequent earthquakes, 7 km NW of The Geysers, CA had 110 earthquakes.**
+
 ```{r}
+earthquakes_most_common_locations <- earthquakes |>
+  group_by(place) |>
+  count() |>
+arrange(desc(n)) 
+
+```
+
+**I found it really interesting that most of these were in Fiji!**
+
+```{r}
+earthquakes_over_six_hundred <- earthquakes |>
+  filter(depth >= 600)
+  nrow(earthquakes_over_six_hundred)
 
 ```
 
 ```{r}
 
-```
-
-```{r}
 
 ```
