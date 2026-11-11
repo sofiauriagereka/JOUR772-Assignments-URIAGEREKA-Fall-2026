@@ -1,0 +1,159 @@
+---
+title: "lab_08"
+author: "Derek Willis"
+date: "2025-01-16"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Load libraries and establish settings
+
+**Task** Create a codeblock and load appropriate packages and settings for this lab. We'll be making some charts, working with dates and retrieving Census data.
+
+```{r}
+library(tidyverse)
+library(lubridate)
+library(tidycensus)
+```
+
+## Load and modify data
+
+**Task** Create a codeblock and load the following data from the data folder:
+
+- Prince George's County 911 Overdose Calls
+
+```{r}
+pg_county_911_calls <- read_csv("data/prince_georges_2022_overdoses.csv") |>    clean_names()
+
+glimpse(pg_county_911_calls)
+
+```
+
+```{r}
+pg_county_911_calls <- pg_county_911_calls |> mutate(date = floor_date(datetime, "day"), week = floor_date(datetime, "week"), month = month(datetime, label = TRUE))
+```
+
+You will need to create columns for the date, week and month based on the existing `datetime` column.
+
+## Questions
+
+**Q1.** Which month saw the greatest percentage of total calls? Create a dataframe that calculates the percentage of all calls that each month's calls represents. Make a bar chart from that dataframe. Your bar chart must have:
+
+- A clear title that states the main idea/finding
+- Good labels for the x & y axis and a caption for the source, which is Prince George's County EMS.
+- Readable bars - the values shouldn't be overlapping
+
+Compare the results here to those from the pre_lab_08 bar chart - are there major differences in the months with the highest and lowest figures? Describe that below.
+
+**A1.**
+
+**Yes, the charts differ in that the pre-lab has August as the highest month and May as the second, where this chart has December as the highest and July as the second highest.**
+
+```{r}
+
+calls_by_month <- pg_county_911_calls |>
+  group_by(month) |>
+  summarise(total_calls = n()) |>
+  mutate(percent = (total_calls / sum(total_calls)) * 100) |>
+  arrange(desc(percent))
+
+```
+
+```{r}
+calls_by_month |>
+  ggplot() +
+  geom_bar(aes(x = reorder(month, percent), weight = percent)) +
+  coord_flip() +
+  theme_minimal() +
+  labs(title = "Prince George's County Calls", x = "Month", y = "Percent of total calls", caption = "Source: Prince George's County EMS")
+```
+
+**Q2.** Let's visualize this data on a weekly basis using a line chart. As in Q1, generate a dataframe with the total number of calls for each week, and then create a line chart to show the distribution of calls over time. Your line chart must have:
+
+- A clear title that states the main idea/finding
+- Good labels for the x & y axis and a caption for the source, which is Prince George's County EMS.
+- Readable labels
+
+Describe the pattern of results; you may want to look at the data to dig into particular outliers.
+
+**A2.**
+
+**Mid July saw the highest spike in calls, and March and April saw sharp dips in the rates of calls.**
+
+```{r}
+
+week_calls <- pg_county_911_calls |>
+  group_by(week) |>
+  summarise(total_calls = n ()) |>
+  arrange(week)
+```
+
+```{r}
+week_calls |>
+  ggplot() +
+  geom_line(aes(x = week, y = total_calls)) +
+  scale_x_date(date_breaks = "4 weeks", date_labels = "%b %d") + theme_minimal () + theme(axis.text.x = element_text(angle =90, hjust = 1)) + 
+  labs(
+    title = "The week of July 18 saw the most calls",
+    x = "Weeks",
+    y = "Total Calls",
+    caption = "Source: Prince George's County EMS"
+  )
+```
+
+**Q3.** A scatterplot is a type of chart that helps us see relationships between two variables. One variable goes on the x axis, the other on the y axis. For each row/observation in our data, a scatterplot puts a circle (or a "point") where the two variables intersect on a grid.
+
+Statisticians use scatterplots to show graphically whether one variable is correlated -- related, in a statistical sense -- with another variable. A classic example is the [relationship between ice cream sales and temperature](https://www.mathsisfun.com/data/scatter-xy-plots.html). The scatterplot below -- press play to load the image -- shows that relationship, that an increase in temperature is associated with an increase in ice cream sales. When it's 12C, sales are 200 dollars, and when it's hotter, 25C, sales are 600 dollars.
+
+```{r}
+knitr::include_graphics("https://www.mathsisfun.com/data/images/scatter-ice-cream1.svg")
+```
+
+We're going to use a scatterplot a little differently, to get a visual sense of two key variables:
+
+Our question is: does the median income in a zip code have any relationship to the number of overdose 911 calls in that zip code?
+
+To answer this question, do the following:
+
+1.  Generate a dataframe with the number of 911 calls for each zip code.
+2.  Get data from the Census Bureau showing median household income for Maryland zip codes.
+3.  Join those two dataframes on their zip code columns, starting with the 911 calls dataframe.
+4.  Make a scatterplot showing the total calls and median income. I didn't show you how to do this, so look it up! Googling "ggplot scatterplot" is a good start.
+5.  Give it an appropriate title, source, and x and y axis titles.
+6.  Add a label for each point that shows the zip code using geom_text() - see some examples of its use at <https://ggplot2.tidyverse.org/reference/geom_text.html#ref-examples>. Try to make the names as easy to read as possible by avoiding overlap.
+7.  In the answer space below, describe what you see and answer the questions posed above. In a general sense, what do you think this means? Feel free to consider the actual raw values: how would you report out the main point(s) of this chart?
+
+**A3. As is to be expected, areas with a higher median income have more access to resources, so they have less frequent OD-related calls, but the 75,000 range has the highest rate of OD calls overall.**
+
+```{r}
+
+census_api_key
+
+calls_by_zip <- pg_county_911_calls |>
+  mutate(zip = as.character(zipcode)) |>
+  group_by(zip) |>
+  summarise(total_calls = n())
+
+zip_income <- get_acs(geography = "zcta", variables = c(median_income = "B19013_001"), state = "MD", year = 2019)
+
+calls_income <- calls_by_zip |>
+  inner_join(zip_income, by = c("zip" = "GEOID")) |>
+  rename(median_income = estimate)
+  
+```
+
+```{r}
+calls_income |>
+  ggplot(aes (x = median_income, y = total_calls)) +
+  geom_point () +
+  geom_text(aes(label = zip), check_overlap= TRUE, vjust = -1, size =3) + theme_minimal () +
+  labs(
+    title = "Income disparity is also reflected in emergency overdose calls",
+    x = "Median household income",
+    y = "Total OD calls",
+    caption = "Source: Prince George's Co. EMS, US Census Bureau ACS"
+  )
+```
