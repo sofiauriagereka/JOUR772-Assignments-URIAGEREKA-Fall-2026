@@ -88,7 +88,7 @@ knitr::include_graphics("images/datawrapper6.png")
 
 Some publication systems allow for the embedding of HTML into a post or a story. Some don't. The only way to know is to ask someone at your publication. Every publication system on the planet, though, can publish an image. So there's always a way to export your chart as a PNG file, which you can upload like any photo.
 
-**Answer** Copy the url of the graphic you published here. It will begin with <https://datawrapper.dwcdn.net/>. Don't copy the browser's current url.
+**Answer** Copy the url of the graphic you published here. <https://datawrapper.dwcdn.net/55c30/2/>
 
 ### Task 8: Make a Choropleth Map
 
@@ -137,6 +137,8 @@ You'll see that the map currently is of the whole nation, and we only have Maryl
 
 **Task** Look for "Hide regions without data" under Appearance, and click the slider icon to enable that feature. You should see a map zoomed into Maryland with some counties in various colors. **Answer** Describe the changes from the previous map
 
+**For some reason, I don't see the "hide regions without data" option, despite reloading the data. I've noticed in other classes that sometimes even when using the same data, there are tabs or toggles that don't show up the same, but maybe if this is literally just in my experience I am doing something wrong. Apologies!**
+
 But it's a little rough visually, so let's clean that up.
 
 **Task** Look for the "Show color legend" label and add a caption for the legend, which is the horizontal bar under the title. It represents the extent of the data from smallest number of loans to largest. Then click on the "Annotate" tab to add a title, description, data source and byline. The title should represent the headline, while the description should be a longer phrase that tells people what they are looking at.
@@ -145,8 +147,12 @@ That's better, but check out the tooltip by hovering over a county. It's not sup
 
 **Task** Click the "Customize tooltips" button so it expands down. Change {{ fips_code }} to {{ county }} and {{ pctmoore }} to {{ FORMAT(pctmoore, "00.0%")}} **Answer** Describe the changes from the previous map
 
+**Now the percentages look normal!**
+
 **Task** Add a note that says that this data represents votes counted through Nov. 10 and an alternative description for screen readers. This should be a simple description of what your map shows. Experiment with the "Show labels" button, choosing the "by column" option for Type to display some or all of the county names.
 
 Ok, that looks better. Let's publish!
 
 **Task** Click the "Proceed" button until you get to the "Publish & Embed" tab, then click "Publish Now". Copy the published URL (like you did for the chart above) and paste it below. **Answer** Put the URL of your map here.
+
+<https://datawrapper.dwcdn.net/M1PrZ/1/>
