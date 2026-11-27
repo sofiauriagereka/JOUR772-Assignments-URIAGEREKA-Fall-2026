@@ -136,7 +136,7 @@ results <- mde_url |>
 
 # show the dataframe
 
-results
+results 
 ```
 
 In the environment window at right, look at results Note that it's now a "list of 2".
@@ -147,7 +147,7 @@ Let's say we are interested in 2023, so all we need to do now is to store that f
 
 ### Task 5: Save one table from the HTML source
 
-**Task** Run the following code in the gray-colored codeblock below to extract all tables in the HTML and save it as a dataframe. What do you notice about the columns? **Answer**
+**Task** Run the following code in the gray-colored codeblock below to extract all tables in the HTML and save it as a dataframe. What do you notice about the columns? **Answer: now it's split into dates and text**
 
 ```{r}
 # Read in all html from table, store all tables on page as nested list of dataframes.
@@ -170,7 +170,7 @@ From here, we can do a little cleaning. First we'll use clean_names() to lower t
 
 ### Task 6: Clean up the data
 
-**Task** Run the following code to extract the table we want, clean up the names and change the date column to an actual date. Look at the dataframe; what other information about these releases might you want to add? **Answer**
+**Task** Run the following code to extract the table we want, clean up the names and change the date column to an actual date. Look at the dataframe; what other information about these releases might you want to add? **Answer: I would maybe add what sub-department the press releases came from?**
 
 ```{r}
 # Read in all html from table, get the HTML table.
@@ -244,7 +244,7 @@ tags. What does the output suggest about how many
 
 <ul>
 
-tags there are in the HTML source? **Answer**
+tags there are in the HTML source? **Answer: that many of the**<li>**tags are applied for different hyperlinks, not just the press releases that we're interested in**
 
 ```{r}
 osp_results |> html_elements('li')
@@ -266,7 +266,7 @@ tags. To do that, we add `html_text()` to the end of the last code block:
 
 <li>
 
-tags. Describe the output: **Answer**
+tags. Describe the output: **Answer: this is the text that comes after the**<li>**tag.**
 
 ```{r}
 osp_results |> html_elements('li') |> html_text()
@@ -280,7 +280,7 @@ Ok, so now we can see the press releases. But they are surrounded by a bunch of 
 
 tags into a dataframe
 
-**Task** Run the following code in the gray-colored codeblock below to make a dataframe. Describe the output: **Answer**
+**Task** Run the following code in the gray-colored codeblock below to make a dataframe. Describe the output: **Answer: a sort of haphazard data frame, with just one value.**
 
 ```{r}
 releases <- osp_results |> html_elements('li') |> html_text() |> as_tibble()
